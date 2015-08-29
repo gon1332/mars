@@ -1,4 +1,6 @@
-## MARS (MIPS Assembler and Runtime Simulator) [![Build Status](https://travis-ci.org/carlosrabelo/mars.png)](https://travis-ci.org/carlosrabelo/mars)
+[![Build Status](https://travis-ci.org/carlosrabelo/mars.png)](https://travis-ci.org/carlosrabelo/mars)
+
+## MARS (MIPS Assembler and Runtime Simulator) 
 
 ### An IDE for MIPS Assembly Language Programming
 
