@@ -1,20 +1,23 @@
-apply plugin: "java"
-apply plugin: "application"
-apply plugin: "eclipse"
+apply plugin: 'java'
+apply plugin: 'application'
 
 repositories {
     mavenLocal()
     mavenCentral()
 }
 
-mainClassName = "Mars"
+mainClassName = 'Mars'
 
 jar {
     manifest {
-        baseName = "mars"
-        version = "4.5"
+        baseName = 'mars'
+        version = '4.5'
         manifest {
-            attributes "Main-Class": mainClassName
+            attributes 'Main-Class': mainClassName
         }
     }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "iso-8859-1"
 }
