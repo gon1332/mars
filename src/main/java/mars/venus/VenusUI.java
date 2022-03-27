@@ -71,7 +71,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       private JMenu file, run, window, help, edit, settings;
       private JMenuItem fileNew, fileOpen, fileClose, fileCloseAll, fileSave, fileSaveAs, fileSaveAll, fileDumpMemory, filePrint, fileExit;
       private JMenuItem editUndo, editRedo, editCut, editCopy, editPaste, editFindReplace, editSelectAll;
-      private JMenuItem runGo, runStep, runBackstep, runReset, runAssemble, runStop, runPause, runClearBreakpoints, runToggleBreakpoints;
+      private JMenuItem runGo, runStepOver, runStep, runBackstep, runReset, runAssemble, runStop, runPause, runClearBreakpoints, runToggleBreakpoints;
       private JCheckBoxMenuItem settingsLabel, settingsPopupInput, settingsValueDisplayBase, settingsAddressDisplayBase,
               settingsExtended, settingsAssembleOnOpen, settingsAssembleAll, settingsWarningsAreErrors, settingsStartAtMain,
       		  settingsDelayedBranching, settingsProgramArguments, settingsSelfModifyingCode;
@@ -81,7 +81,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // components of the toolbar
       private JButton Undo, Redo, Cut, Copy, Paste, FindReplace, SelectAll;
       private JButton New, Open, Save, SaveAs, SaveAll, DumpMemory, Print;
-      private JButton Run, Assemble, Reset, Step, Backstep, Stop, Pause;
+      private JButton Run, Assemble, Reset, StepOver, Step, Backstep, Stop, Pause;
       private JButton Help;
    
       // The "action" objects, which include action listeners.  One of each will be created then
@@ -93,7 +93,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       EditUndoAction editUndoAction;
       EditRedoAction editRedoAction;
       private Action editCutAction, editCopyAction, editPasteAction, editFindReplaceAction, editSelectAllAction;
-      private Action runAssembleAction, runGoAction, runStepAction, runBackstepAction, runResetAction, 
+      private Action runAssembleAction, runGoAction, runStepOverAction, runStepAction, runBackstepAction, runResetAction, 
                      runStopAction, runPauseAction, runClearBreakpointsAction, runToggleBreakpointsAction;
       private Action settingsLabelAction, settingsPopupInputAction, settingsValueDisplayBaseAction, settingsAddressDisplayBaseAction,
                      settingsExtendedAction, settingsAssembleOnOpenAction, settingsAssembleAllAction,
@@ -324,6 +324,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                									  "Run the current program", new Integer(KeyEvent.VK_G),
                									  KeyStroke.getKeyStroke( KeyEvent.VK_F5, 0),
                									  mainUI);	
+            runStepOverAction = new RunStepOverAction("Step Over", 
+                                            new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepOver22.png"))),
+               									  "Run one step over subroutines", new Integer(KeyEvent.VK_J),
+               									  KeyStroke.getKeyStroke( KeyEvent.VK_F6, 0),
+               									  mainUI);	
             runStepAction = new RunStepAction("Step", 
                                             new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepForward22.png"))),
                									  "Run one step at a time", new Integer(KeyEvent.VK_T),
@@ -545,6 +550,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          runAssemble.setIcon(new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"Assemble16.png"))));//"MyAssemble16.gif"))));
          runGo = new JMenuItem(runGoAction);
          runGo.setIcon(new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"Play16.png"))));//"Play16.gif"))));
+         runStepOver = new JMenuItem(runStepOverAction);
+         runStepOver.setIcon(new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepOver16.png"))));//"MyStepOver16.gif"))));
          runStep = new JMenuItem(runStepAction);
          runStep.setIcon(new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepForward16.png"))));//"MyStepForward16.gif"))));
          runBackstep = new JMenuItem(runBackstepAction);
@@ -562,6 +569,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       
          run.add(runAssemble);
          run.add(runGo);
+         run.add(runStepOver);
          run.add(runStep);
          run.add(runBackstep);
          run.add(runPause);
@@ -686,6 +694,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          Run.setText("");
          Assemble = new JButton(runAssembleAction);
          Assemble.setText(""); 
+         StepOver = new JButton(runStepOverAction);
+         StepOver.setText(""); 
          Step = new JButton(runStepAction);
          Step.setText(""); 
          Backstep = new JButton(runBackstepAction);
@@ -717,6 +727,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          toolBar.add(new JToolBar.Separator());
          toolBar.add(Assemble);
          toolBar.add(Run);   
+         toolBar.add(StepOver);   
          toolBar.add(Step);
          toolBar.add(Backstep);
          toolBar.add(Pause);
@@ -798,6 +809,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsMemoryConfigurationAction.setEnabled(true); // added 21 July 2009
          runAssembleAction.setEnabled(false);
          runGoAction.setEnabled(false);
+         runStepOverAction.setEnabled(false);
          runStepAction.setEnabled(false);
          runBackstepAction.setEnabled(false);
          runResetAction.setEnabled(false);
@@ -838,6 +850,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			// Otherwise, clear them out.  DPS 9-Aug-2011
          if (!Globals.getSettings().getBooleanSetting(mars.Settings.ASSEMBLE_ALL_ENABLED)) {
             runGoAction.setEnabled(false);
+            runStepOverAction.setEnabled(false);
             runStepAction.setEnabled(false);
             runBackstepAction.setEnabled(false);
             runResetAction.setEnabled(false);
@@ -876,6 +889,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsMemoryConfigurationAction.setEnabled(true); // added 21 July 2009
          runAssembleAction.setEnabled(true);
          runGoAction.setEnabled(false);
+         runStepOverAction.setEnabled(false);
          runStepAction.setEnabled(false);
          runBackstepAction.setEnabled(false);
          runResetAction.setEnabled(false);
@@ -912,6 +926,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsMemoryConfigurationAction.setEnabled(true); // added 21 July 2009
          runAssembleAction.setEnabled(false);
          runGoAction.setEnabled(false);
+         runStepOverAction.setEnabled(false);
          runStepAction.setEnabled(false);
          runBackstepAction.setEnabled(false);
          runResetAction.setEnabled(false);
@@ -948,6 +963,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsMemoryConfigurationAction.setEnabled(true); // added 21 July 2009
          runAssembleAction.setEnabled(true);
          runGoAction.setEnabled(true);
+         runStepOverAction.setEnabled(true);
          runStepAction.setEnabled(true);
          runBackstepAction.setEnabled(
             (Globals.getSettings().getBackSteppingEnabled()&& !Globals.program.getBackStepper().empty())
@@ -985,6 +1001,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsMemoryConfigurationAction.setEnabled(false); // added 21 July 2009
          runAssembleAction.setEnabled(false);
          runGoAction.setEnabled(false);
+         runStepOverAction.setEnabled(false);
          runStepAction.setEnabled(false);
          runBackstepAction.setEnabled(false);
          runResetAction.setEnabled(false);
@@ -1019,6 +1036,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
          settingsMemoryConfigurationAction.setEnabled(true); // added 21 July 2009
          runAssembleAction.setEnabled(true);
          runGoAction.setEnabled(false);
+         runStepOverAction.setEnabled(false);
          runStepAction.setEnabled(false);
          runBackstepAction.setEnabled(
             (Globals.getSettings().getBackSteppingEnabled()&& !Globals.program.getBackStepper().empty())

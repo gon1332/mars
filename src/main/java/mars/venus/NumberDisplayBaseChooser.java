@@ -4,6 +4,7 @@
    import java.awt.*;
    import java.awt.event.*;
    import javax.swing.*;
+   import java.nio.*;
 	
 	/*
 Copyright (c) 2003-2006,  Pete Sanderson and Kenneth Vollmar
@@ -155,7 +156,57 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       //          }
       }
    	 
-   	 
+    /**
+     * Produces a string form of an integer given the value and the
+     * numerical base to convert it to.  There is an instance
+     * method that uses the internally stored base.  This class
+     * method can be used by anyone anytime.
+     * @param value the number to be converted
+     * @param base the numerical base to use (currently 10 or 16)
+     * @param byteDisplay if true it prints each byte separately in the right memory sequence delimited by space
+     * @return a String equivalent of the value rendered appropriately.
+     */
+	public static String formatNumber(int value, int base, boolean byteDisplay) {
+		String result;
+		if (byteDisplay) {
+			StringBuffer buffer = new StringBuffer();
+			byte[] bytes =  ByteBuffer.allocate(4).putInt(value).array();
+			for (int i=3; i>=0; i--) {
+				switch (base) {
+					case HEXADECIMAL :
+						buffer.append(String.format("  %02x", bytes[i]));
+						break;
+					case DECIMAL :
+						buffer.append(String.format("% 4d", bytes[i]));
+						break;
+					case ASCII : 
+						buffer.append(" ");
+						buffer.append((bytes[i] < Globals.ASCII_TABLE.length) ? Globals.ASCII_TABLE[bytes[i]] : Globals.ASCII_NON_PRINT );
+						break;
+					default :
+						buffer.append(String.format("% 4d", bytes[i]));
+				}
+			}
+			result = buffer.toString();
+		}
+		else {
+			switch (base) {
+				case HEXADECIMAL :
+					result = Binary.intToHexString(value);
+					break;
+				case DECIMAL :
+					result =  Integer.toString(value);
+					break;
+				case ASCII : 
+					result = Binary.intToAscii(value);
+					break;
+				default :
+					result = Integer.toString(value);
+			}
+		}
+		return result;
+	 }
+			   
     /**
      * Produces a string form of a float given the value and the
      * numerical base to convert it to.  There is an instance

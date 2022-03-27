@@ -496,7 +496,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (starterName.equals("Step")) {
                ((RunStepAction)starter).stepped(done,constructReturnReason,pe);
             }   
-            if (starterName.equals("Go")) {
+            else if (starterName.equals("Go")) {
                if (done) {
                   ((RunGoAction)starter).stopped(pe,constructReturnReason);
                } 
@@ -512,6 +512,26 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                      ((RunGoAction)starter).stopped(pe,constructReturnReason);
                   }
                }
+            }
+            else if (starterName.equals("Step Over")) {
+			    if (maxSteps == 1) {
+					((RunStepOverAction)starter).stepped(done,constructReturnReason,pe);
+				}
+				else if (done) {
+					((RunStepOverAction)starter).stopped(pe,constructReturnReason);
+				} 
+				else if (constructReturnReason == BREAKPOINT) {
+					((RunStepOverAction)starter).paused(done,constructReturnReason,pe);
+				} 
+				else {
+					String stopperName = (String) stopper.getValue(AbstractAction.NAME);
+					if ("Pause".equals(stopperName)) {
+						((RunStepOverAction)starter).paused(done,constructReturnReason,pe);
+					}
+					else if ("Stop".equals(stopperName)) {
+						((RunStepOverAction)starter).stopped(pe,constructReturnReason);
+					}
+				}
             }
             return;
          }

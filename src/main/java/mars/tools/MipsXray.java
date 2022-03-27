@@ -67,6 +67,7 @@ import mars.mips.instructions.BasicInstruction;
 import mars.mips.instructions.BasicInstructionFormat;
 import mars.venus.RunAssembleAction;
 import mars.venus.RunBackstepAction;
+import mars.venus.RunStepOverAction;
 import mars.venus.RunStepAction;
 import mars.venus.VenusUI;
 
@@ -86,8 +87,8 @@ public class MipsXray extends AbstractMarsToolAndApplication{
     private String instructionBinary; 
     
     //Components to add menu bar in the plugin window.
-    private JButton  Assemble,  Step, runBackStep;
-    private Action runAssembleAction, runStepAction, runBackstepAction;
+    private JButton  Assemble,  StepOver, Step, runBackStep;
+    private Action runAssembleAction, runStepOverAction, runStepAction, runBackstepAction;
     
     private VenusUI mainUI;
     private JToolBar toolbar;
@@ -130,7 +131,7 @@ public class MipsXray extends AbstractMarsToolAndApplication{
              						"\n"+
 										"To see the datapath of register bank and control units click inside the functional unit.\n\n" +
              						"Version 2.0\n" + 
-             						"Developed by Márcio Roberto, Guilherme Sales, Fabrício Vivas, Flávio Cardeal and Fábio Lúcio\n" +
+             						"Developed by MÃ¡rcio Roberto, Guilherme Sales, FabrÃ­cio Vivas, FlÃ¡vio Cardeal and FÃ¡bio LÃºcio\n" +
              						"Contact Marcio Roberto at marcio.rdaraujo@gmail.com with questions or comments.\n"
              						;
           JButton help = new JButton("Help");
@@ -283,10 +284,12 @@ public class MipsXray extends AbstractMarsToolAndApplication{
            Assemble.setText(""); 
            runBackStep = new JButton(runBackstepAction);
            runBackStep.setText(""); 
-           
+           StepOver = new JButton(runStepOverAction);
+           StepOver.setText("");      	
            Step = new JButton(runStepAction);
            Step.setText("");      	
            toolBar.add(Assemble);
+           toolBar.add(StepOver);
            toolBar.add(Step);
 
            return toolBar;     
@@ -303,6 +306,11 @@ public class MipsXray extends AbstractMarsToolAndApplication{
    							  KeyStroke.getKeyStroke( KeyEvent.VK_F3, 0), 
    							  mainUI);			
 
+               runStepOverAction = new RunStepOverAction("Step Over", 
+                       new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepOver22.png"))),
+   							  "Run one step over subroutines", new Integer(KeyEvent.J),
+   							  KeyStroke.getKeyStroke( KeyEvent.VK_F6, 0),
+   							  mainUI);	
                runStepAction = new RunStepAction("Step", 
                        new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepForward22.png"))),
    							  "Run one step at a time", new Integer(KeyEvent.VK_T),
