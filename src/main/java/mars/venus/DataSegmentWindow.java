@@ -55,6 +55,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       private JPanel tablePanel;
       private JButton dataButton, nextButton, prevButton, stakButton, globButton, heapButton, kernButton, extnButton, mmioButton, textButton;
       private JCheckBox asciiDisplayCheckBox;
+      private JCheckBox byteDisplayCheckBox;
    	
       static final int VALUES_PER_ROW = 8;
       static final int NUMBER_OF_ROWS = 16;  // with 8 value columns, this shows 512 bytes;  
@@ -72,6 +73,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    
       private boolean addressHighlighting = false;
       private boolean asciiDisplay = false;
+      private boolean byteDisplay = false;
       private int addressRow, addressColumn, addressRowFirstAddress;
       private Settings settings;
    	
@@ -162,6 +164,16 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                   }
                });
          features.add(asciiDisplayCheckBox);
+         byteDisplayCheckBox = new JCheckBox("Split Bytes", byteDisplay);
+         byteDisplayCheckBox.setToolTipText("Display data segment values by bytes instead of by words");
+         byteDisplayCheckBox.addItemListener( 
+               new ItemListener() {
+                  public void itemStateChanged(ItemEvent e) {
+					byteDisplay = (e.getStateChange() == ItemEvent.SELECTED);
+                     DataSegmentWindow.this.updateValues();
+                  }
+               });
+         features.add(byteDisplayCheckBox);
       	
          contentPane.add(features, BorderLayout.SOUTH);  
       }  
@@ -508,7 +520,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             ((DataTableModel)dataModel).setDisplayAndModelValueAt(NumberDisplayBaseChooser.formatUnsignedInteger(address, addressBase),row,ADDRESS_COLUMN);
             for (int column=1; column<NUMBER_OF_COLUMNS; column++) {
                try {
-                  ((DataTableModel)dataModel).setDisplayAndModelValueAt(NumberDisplayBaseChooser.formatNumber(Globals.memory.getWordNoNotify(address), valueBase),row,column);
+                  ((DataTableModel)dataModel).setDisplayAndModelValueAt(NumberDisplayBaseChooser.formatNumber(Globals.memory.getWordNoNotify(address), valueBase, byteDisplay),row,column);
                } 
                   catch (AddressErrorException aee) {
                      // Bit of a hack here.  Memory will throw an exception if you try to read directly from text segment when the
@@ -940,10 +952,28 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       	* value is valid, MIPS memory is updated.
          */
          public void setValueAt(Object value, int row, int col) {
+			int valueBase = Globals.getGui().getMainPane().getExecutePane().getValueDisplayBase();
             int val=0;
             int address=0;
             try {
-               val = Binary.stringToInt((String) value);
+				if (byteDisplay) {
+					String[] strings = ((String) value).split(" +");
+					int byteidx = 0;
+					for (String str: strings) {
+						if (str.length() < 1) continue;
+						val = val + ((valueBase == 10 ? Binary.stringToInt(str) 
+													  : ((Character.digit(str.charAt(0), 16) << 4) + Character.digit(str.charAt(1), 16)))
+									 << (byteidx++ * 8));
+					}
+					if (byteidx != 4) {
+						data[row][col] = "INVALID";
+						fireTableCellUpdated(row, col);
+						return;
+					}
+				}
+				else {
+					val = Binary.stringToInt((String) value);
+				}
             }
                catch (NumberFormatException nfe) {
                   data[row][col] = "INVALID";
@@ -971,8 +1001,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                      return;
                   }
             }// end synchronized block
-            int valueBase = Globals.getGui().getMainPane().getExecutePane().getValueDisplayBase();
-            data[row][col] = NumberDisplayBaseChooser.formatNumber(val, valueBase); 
+            data[row][col] = NumberDisplayBaseChooser.formatNumber(val, valueBase, byteDisplay); 
             fireTableCellUpdated(row, col);
             return;
          }
