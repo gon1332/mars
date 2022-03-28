@@ -77,8 +77,12 @@
          addKeyBinding("MS+RIGHT",SELECT_END);
          addKeyBinding("UP",PREV_LINE);
          addKeyBinding("S+UP",SELECT_PREV_LINE);
+         addKeyBinding("M+UP",DOCUMENT_HOME);
+         addKeyBinding("MS+UP",SELECT_DOC_HOME);
          addKeyBinding("DOWN",NEXT_LINE);
          addKeyBinding("S+DOWN",SELECT_NEXT_LINE);
+         addKeyBinding("M+DOWN",DOCUMENT_END);
+         addKeyBinding("MS+DOWN",SELECT_DOC_END);
       
          addKeyBinding("C+ENTER",REPEAT);
       
