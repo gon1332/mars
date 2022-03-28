@@ -69,7 +69,7 @@
          addKeyBinding("CS+LEFT",SELECT_PREV_WORD);
          addKeyBinding("M+LEFT",HOME);
          addKeyBinding("M+RIGHT",END);
-		 addKeyBinding("RIGHT",NEXT_CHAR);
+         addKeyBinding("RIGHT",NEXT_CHAR);
          addKeyBinding("S+RIGHT",SELECT_NEXT_CHAR);
          addKeyBinding("C+RIGHT",NEXT_WORD);
          addKeyBinding("CS+RIGHT",SELECT_NEXT_WORD);
