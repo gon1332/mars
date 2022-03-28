@@ -82,14 +82,19 @@ public class RunStepOverAction extends GuiAction  {
 					mainUI.setMenuState(FileStatus.RUNNING);
 					try {
 						int[] breakPoints = executePane.getTextSegmentWindow().getSortedBreakPointsArray();
-						if (breakPoints == null || breakPoints.length == 0 || breakPoints[0] > pc + 4) {
-							int[] breakPoints2 = new int[breakPoints != null ? breakPoints.length+1 : 1];
-							breakPoints2[0] = pc + 4;
-							for (int i=0; breakPoints != null && i<breakPoints.length; i++) {
-								breakPoints2[i+1] = breakPoints[i];
+						int[] breakPoints2 = new int[breakPoints != null ? breakPoints.length+1 : 1];
+						int insert = 0;
+						for (int i=0; breakPoints != null && i<breakPoints.length; i++) {
+							if (insert == 0 && breakPoints[i] >= pc + 4) {
+								breakPoints2[i] = pc + 4;		// it is ok if the breakpoints already contain the next instruction - we will have it twice
+								insert++;
 							}
-							breakPoints = breakPoints2;
+							breakPoints2[i+insert] = breakPoints[i];
 						}
+						if (insert == 0) {
+							breakPoints2[breakPoints2.length-1] = pc + 4;		// it is ok if the breakpoints already contain the next instruction - we will have it twice
+						}
+						breakPoints = breakPoints2;
 						done = Globals.program.simulateFromPC(breakPoints,maxSteps,this);
 					} 
 					catch (ProcessingException pe) {
