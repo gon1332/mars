@@ -308,7 +308,7 @@ public class MipsXray extends AbstractMarsToolAndApplication{
 
                runStepOverAction = new RunStepOverAction("Step Over", 
                        new ImageIcon(tk.getImage(cs.getResource(Globals.imagesPath+"StepOver22.png"))),
-   							  "Run one step over subroutines", new Integer(KeyEvent.J),
+   							  "Run one step over subroutines", new Integer(KeyEvent.VK_J),
    							  KeyStroke.getKeyStroke( KeyEvent.VK_F6, 0),
    							  mainUI);	
                runStepAction = new RunStepAction("Step", 
