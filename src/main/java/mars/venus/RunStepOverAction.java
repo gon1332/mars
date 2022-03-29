@@ -72,7 +72,7 @@ public class RunStepOverAction extends GuiAction  {
 				statement = Globals.memory.getStatement(pc);
 			} catch (AddressErrorException aee) {}
 			Instruction instruction = statement != null ? statement.getInstruction() : null;
-			if (instruction != null && instruction.getName().equals("jal")) {
+			if (instruction != null && instruction.getName().startsWith("jal")) {
 				if (mainUI.getReset() || mainUI.getStarted()){
 		
 					mainUI.setStarted(true);  // added 8/27/05
