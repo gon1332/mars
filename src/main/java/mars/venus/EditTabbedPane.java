@@ -1,22 +1,18 @@
 package mars.venus;
 
+import mars.*;
 import mars.mips.hardware.*;
 import mars.util.*;
-import mars.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
-import java.awt.event.*;
-import javax.swing.undo.*;
-import java.text.*;
-import java.util.*;
+import java.beans.*;
 import java.io.*;
-import java.beans.PropertyChangeListener;
 import java.util.List;
-import javax.swing.filechooser.FileFilter;
+import java.util.*;
 
 	/*
 Copyright (c) 2003-2010,  Pete Sanderson and Kenneth Vollmar
