@@ -1,19 +1,18 @@
 package mars.venus;
 
+import mars.*;
 import mars.mips.hardware.*;
 import mars.util.*;
-import mars.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.undo.*;
-import java.text.*;
-import java.util.*;
-import java.io.*;
-import java.beans.PropertyChangeListener;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
+import java.beans.*;
+import java.io.*;
+import java.util.List;
+import java.util.*;
 
 	/*
 Copyright (c) 2003-2010,  Pete Sanderson and Kenneth Vollmar
@@ -68,23 +67,36 @@ public class EditTabbedPane extends JTabbedPane {
         this.fileOpener = new FileOpener(editor);
         this.mainPane = mainPane;
         this.editor.setEditTabbedPane(this);
-        this.addChangeListener(
-                new ChangeListener() {
-                    public void stateChanged(ChangeEvent e) {
-                        EditPane editPane = (EditPane) getSelectedComponent();
-                        if (editPane != null) {
-                            // New IF statement to permit free traversal of edit panes w/o invalidating
-                            // assembly if assemble-all is selected.  DPS 9-Aug-2011
-                            if (Globals.getSettings().getBooleanSetting(mars.Settings.ASSEMBLE_ALL_ENABLED)) {
-                                EditTabbedPane.this.updateTitles(editPane);
-                            } else {
-                                EditTabbedPane.this.updateTitlesAndMenuState(editPane);
-                                EditTabbedPane.this.mainPane.getExecutePane().clearPane();
-                            }
-                            editPane.tellEditingComponentToRequestFocusInWindow();
-                        }
+        this.setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent event) {
+                try {
+                    // We are opening the file, seems like other editors (intellij, sublime text use Move semantic too)
+                    event.acceptDrop(DnDConstants.ACTION_MOVE);
+                    @SuppressWarnings("unchecked")
+                    List<File> droppedFiles = (List<File>) event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : droppedFiles) {
+                        openFile(file);
                     }
-                });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        this.addChangeListener(e -> {
+            EditPane editPane = (EditPane) getSelectedComponent();
+            if (editPane != null) {
+                // New IF statement to permit free traversal of edit panes w/o invalidating
+                // assembly if assemble-all is selected.  DPS 9-Aug-2011
+                if (Globals.getSettings().getBooleanSetting(Settings.ASSEMBLE_ALL_ENABLED)) {
+                    EditTabbedPane.this.updateTitles(editPane);
+                } else {
+                    EditTabbedPane.this.updateTitlesAndMenuState(editPane);
+                    EditTabbedPane.this.mainPane.getExecutePane().clearPane();
+                }
+                editPane.tellEditingComponentToRequestFocusInWindow();
+            }
+        });
     }
 
     /**
@@ -676,7 +688,7 @@ public class EditTabbedPane extends JTabbedPane {
             // See if a new filter has been added to the master list.  If so,
             // regenerate the fileChooser list from the master list.
             if (fileFilterCount < fileFilterList.size() ||
-                fileFilterList.size() != fileChooser.getChoosableFileFilters().length) {
+                    fileFilterList.size() != fileChooser.getChoosableFileFilters().length) {
                 fileFilterCount = fileFilterList.size();
                 // First, "deactivate" the listener, because our addChoosableFileFilter
                 // calls would otherwise activate it!  We want it to be triggered only
