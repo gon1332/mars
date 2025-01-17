@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/carlosrabelo/mars.png)](https://travis-ci.org/carlosrabelo/mars)
+![Build Status](https://github.com/gon1332/mars/actions/workflows/build.yml/badge.svg)
 
 ## MARS (MIPS Assembler and Runtime Simulator) 
 
